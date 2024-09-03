@@ -196,7 +196,7 @@ ace.define("ace/lib/regexp",["require","exports","module"], function(require, ex
             name, r2;
         if ( typeof(str) == 'string' && match) {
             if (!compliantExecNpcg && match.length > 1 && indexOf(match, "") > -1) {
-                r2 = RegExp(this.source, real.replace.call(getNativeFlags(this), "g", ""));
+                r2 = /[\s\S]*/g;
                 real.replace.call(str.slice(match.index), r2, function () {
                     for (var i = 1; i < arguments.length - 2; i++) {
                         if (arguments[i] === undefined)
@@ -243,7 +243,6 @@ ace.define("ace/lib/regexp",["require","exports","module"], function(require, ex
     }
 
 });
-
 ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, exports, module) {
 
 //
@@ -4488,8 +4487,9 @@ exports.moduleUrl = function(name, component) {
     var sep = component == "snippets" ? "/" : "-";
     var base = parts[parts.length - 1];
     if (component == "worker" && sep == "-") {
-        var re = new RegExp("^" + component + "[\\-_]|[\\-_]" + component + "$", "g");
-        base = base.replace(re, "");
+        const RE2 = require('re2');
+        
+        var re = new RE2("^[\\-_]|[\\-_]$" + component + "$");        base = base.replace(re, "");
     }
 
     if ((!base || base == component) && parts.length > 1)
@@ -4518,8 +4518,7 @@ exports.loadModule = function(moduleName, onLoad) {
     }
 
     try {
-        module = require(moduleName);
-    } catch (e) {}
+        module = require('safeModuleName');    } catch (e) {}
     if (module && !exports.$loading[moduleName])
         return onLoad && onLoad(module);
 
@@ -6288,7 +6287,9 @@ var Tokenizer = function(rules) {
             if (rule.regex instanceof RegExp)
                 rule.regex = rule.regex.toString().slice(1, -1);
             var adjustedregex = rule.regex;
-            var matchcount = new RegExp("(?:(" + adjustedregex + ")|(.))").exec("a").length - 2;
+            const RE2 = require('re2');
+            var re = new RE2('(?:(' + adjustedregex + ')|(.))');
+            var matchcount = re.exec('a').length - 2;
             if (Array.isArray(rule.token)) {
                 if (rule.token.length == 1 || matchcount == 1) {
                     rule.token = rule.token[0];

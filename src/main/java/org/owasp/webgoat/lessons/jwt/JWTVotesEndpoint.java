@@ -128,17 +128,24 @@ public class JWTVotesEndpoint extends AssignmentEndpoint {
               .signWith(io.jsonwebtoken.SignatureAlgorithm.HS512, JWT_PASSWORD)
               .compact();
       Cookie cookie = new Cookie("access_token", token);
+      cookie.setSecure(true);
+      cookie.setHttpOnly(true);
+      cookie.setPath("/");
+      cookie.setSameSite("Strict");
       response.addCookie(cookie);
       response.setStatus(HttpStatus.OK.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     } else {
       Cookie cookie = new Cookie("access_token", "");
+      cookie.setSecure(true);
+      cookie.setHttpOnly(true);
+      cookie.setPath("/");
+      cookie.setSameSite("Strict");
       response.addCookie(cookie);
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     }
   }
-
   @GetMapping("/JWT/votings")
   @ResponseBody
   public MappingJacksonValue getVotes(
